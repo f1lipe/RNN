@@ -7,4 +7,5 @@ To simple install, just download the https://github.com/f1lipe/RNN/blob/master/R
 
 References
 Java Neural Network libraries used: http://neuroph.sourceforge.net/
+
 Weka Project: https://www.cs.waikato.ac.nz/ml/weka/
