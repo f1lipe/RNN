@@ -1,0 +1,46 @@
+# Template Description file for a Weka package
+#
+# 
+
+# Package name (required)
+PackageName=ReplicatorNeuralNetwork
+
+# Version (required)
+Version=0.0.1
+
+#Date
+Date=2018-06-13
+
+# Title (required)
+Title=Class for building and using a classifier built on the Replicator Neural Network anomaly detection algorithm/method.
+
+Category=Outlier
+
+# Author (required)
+Author=f1lipe
+
+# Maintainer (required)
+Maintainer=f1lipe <filipe@rocketmail.com>
+
+# License (required)
+License=GPL 3.0
+
+# Description (required)
+Description=Class for building and using a classifier built on the Replicator Neural Network anomaly detection algorithm. Note that this classifier is designed for anomaly detection, it is not designed for solving two-class or multi-class classification problems! For more information see HAWKINS, S.; HE, H.; WILLIAMS, G.; BAXTER, R. Outlier detection using replicator neural networks. Proceedings of the 4th International Conference on Data Warehousing and Knowledge Discovery (2002), 170–180. See also: DAU, H. A.; CIESIELSKI, V.; SONG, A. Anomaly detection using replicator neural networks trained on examples of one class. In Asia-Pacific Conference on Simulated Evolution and Learning (2014), Springer, pp. 311–322.
+
+Changes=The meaning of the values of the class attribute has changed! Anomalies should now correspond to the second class value, no longer the first one. Can now also deal with unary classes. Has moved from classifiers.trees to classifiers.misc.
+
+# Package URL for obtaining the package archive (required)
+PackageURL=http://localhost/ReplicatorNeuralNetwork.zip?download
+
+# URL for further information
+# URL=http://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf
+
+# Enhances various other packages ?
+# Enhances=packageName1,packageName2,...
+
+# Related to other packages?
+#Related=
+
+# Dependencies
+Depends=weka (>=3.7.2)
