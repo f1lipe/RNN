@@ -6,6 +6,7 @@ Class for building and using a classifier built on the Replicator Neural Network
 To simple install, just download the https://github.com/f1lipe/RNN/blob/master/ReplicatorNeuralNetwork/dist/ReplicatorNeuralNetwork.zip , open Weka > Tools Menu > Package Manager and select the downloaded file. The new package will be available at misc classifier folder.
 
 References
+
 Java Neural Network libraries used: http://neuroph.sourceforge.net/
 
 Weka Project: https://www.cs.waikato.ac.nz/ml/weka/
