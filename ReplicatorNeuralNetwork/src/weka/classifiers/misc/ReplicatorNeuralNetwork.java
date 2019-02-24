@@ -293,7 +293,7 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 	 * 
 	 * <pre>
 	 *  -H &lt;num&gt;
-	 *  Hidden layer offset.
+	 *  Hidden layer offset to input and output layer.
 	 *  (default -1)
 	 * </pre>
 	 * 
