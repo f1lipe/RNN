@@ -33,7 +33,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxMinNormalizer;
 
-import weka.classifiers.AbstractClassifier;
+import weka.classifiers.RandomizableClassifier;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.Debug.Log;
@@ -122,10 +122,12 @@ import weka.core.Utils;
  * <!-- options-end -->
  * 
  * @author Filipe (filipe@rocketmail.com)
- * @version $Revision: 12345 $
+ * @version $Revision: 2 $
+ * TODO Add seed support to initialize the neural network
  */
-public class ReplicatorNeuralNetwork extends AbstractClassifier implements TechnicalInformationHandler, Serializable {
-
+public class ReplicatorNeuralNetwork extends RandomizableClassifier 
+	implements TechnicalInformationHandler, Serializable {
+	
 	// For serialization
 	private static final long serialVersionUID = 5586634623177348798L;
 
@@ -137,13 +139,13 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 	private int rowSize;
 
 	// Parameters
-	private int maxEpochs = 1000;
+	private int m_MaxEpochs = 1000;
 
-	private int hiddenLayerOffset = -1;
+	private int m_HiddenLayerOffset = -1;
 
-	private double distanceThreshold = 0.1d;
+	private double m_DistanceThreshold = 0.1d;
 
-	private double maxError = 0.001;
+	private double m_MaxError = 0.001;
 
 	/**
 	 * Returns a string describing this filter
@@ -209,23 +211,51 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 	 */
 	@Override
 	public String toString() {
-
+		String build = "RNN b201903102012 -> ";
 		if (neuralNetwork == null) {
-			return "No model built yet.";
+			return build + "No model built yet.";
 		} else {
-			return "Neural network: " + rowSize + " | " + (rowSize + hiddenLayerOffset) + " | " + rowSize;
+			return build + "Neural network: " + rowSize + " | " + (rowSize + m_HiddenLayerOffset) + " | " + rowSize;
 		}
 	}
 
-	/**
-	 * Returns the tip text for this property
-	 * 
-	 * @return tip text for this property suitable for displaying in the
-	 *         explorer/experimenter gui
-	 */
-	public String subsampleSizeTipText() {
-		return "The size of the subsample used to build each tree.";
-	}
+
+	// Configurations getters and setters
+	  public int getMaxEpochs() {
+		  return m_MaxEpochs;
+	  }
+
+	  public void setMaxEpochs(int m_MaxEpochs) {
+		  this.m_MaxEpochs = m_MaxEpochs;
+	  }
+
+	  public int getHiddenLayerOffset() {
+		  return m_HiddenLayerOffset;
+	  }
+
+	  public void setHiddenLayerOffset(int m_HiddenLayerOffset) {
+		  this.m_HiddenLayerOffset = m_HiddenLayerOffset;
+	  }
+	  
+	  public String numTreesTipText() {
+		    return "The threshold distance to classify an instance as annomaly.";
+	  }
+
+	  public double getDistanceThreshold() {
+		  return m_DistanceThreshold;
+	  }
+
+	  public void setDistanceThreshold(double m_DistanceThreshold) {
+		  this.m_DistanceThreshold = m_DistanceThreshold;
+	  }
+
+	  public double getMaxError() {
+		  return m_MaxError;
+	  }
+
+	  public void setMaxError(double m_MaxError) {
+		  this.m_MaxError = m_MaxError;
+	  }
 
 	/**
 	 * Lists the command-line options for this classifier.
@@ -239,17 +269,17 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 
 		newVector.addElement(new Option(
 				"\tThe difference between the number of neurons in the input/output layers and the hidden layer (default "
-						+ hiddenLayerOffset + ").",
+						+ m_HiddenLayerOffset + ").",
 				"H", 1, "-H <difference number>"));
 
-		newVector.addElement(new Option("\tThe maximum number of epochs (default " + maxEpochs + ").", "I", 1,
+		newVector.addElement(new Option("\tThe maximum number of epochs (default " + m_MaxEpochs + ").", "I", 1,
 				"-I <the maximum number of epochs>"));
 
 		newVector.addElement(new Option(
-				"\tThe threshold distance to classify an instance as annomaly (default " + distanceThreshold + ").",
+				"\tThe threshold distance to classify an instance as annomaly (default " + m_DistanceThreshold + ").",
 				"D", 1, "-D <distance threshold>"));
 
-		newVector.addElement(new Option("\tThe max error to stop training (default " + maxError + ").", "E", 1,
+		newVector.addElement(new Option("\tThe max error to stop training (default " + m_MaxError + ").", "E", 1,
 				"-E <maximum error>"));
 
 		newVector.addAll(Collections.list(super.listOptions()));
@@ -268,16 +298,16 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 		Vector<String> result = new Vector<String>();
 
 		result.add("-H");
-		result.add(String.valueOf(hiddenLayerOffset));
+		result.add(String.valueOf(m_HiddenLayerOffset));
 
 		result.add("-I");
-		result.add(String.valueOf(maxEpochs));
+		result.add(String.valueOf(m_MaxEpochs));
 
 		result.add("-D");
-		result.add(String.valueOf(distanceThreshold));
+		result.add(String.valueOf(m_DistanceThreshold));
 
 		result.add("-E");
-		result.add(String.valueOf(maxError));
+		result.add(String.valueOf(m_MaxError));
 
 		Collections.addAll(result, super.getOptions());
 
@@ -345,22 +375,22 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 
 		optionString = Utils.getOption('H', options);
 		if (optionString.length() != 0) {
-			hiddenLayerOffset = Integer.parseInt(optionString);
+			m_HiddenLayerOffset = Integer.parseInt(optionString);
 		}
 
 		optionString = Utils.getOption('I', options);
 		if (optionString.length() != 0) {
-			maxEpochs = Integer.parseInt(optionString);
+			m_MaxEpochs = Integer.parseInt(optionString);
 		}
 
 		optionString = Utils.getOption('D', options);
 		if (optionString.length() != 0) {
-			distanceThreshold = Double.parseDouble(optionString);
+			m_DistanceThreshold = Double.parseDouble(optionString);
 		}
 
 		optionString = Utils.getOption('E', options);
 		if (optionString.length() != 0) {
-			maxError = Double.parseDouble(optionString);
+			m_MaxError = Double.parseDouble(optionString);
 		}
 
 		super.setOptions(options);
@@ -380,7 +410,7 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 		// Evaluate the network length.
 		rowSize = data.numAttributes() - 1;
 		// Set the hidden layer size.
-		int hiddenLayerSize = rowSize - hiddenLayerOffset;
+		int hiddenLayerSize = rowSize - m_HiddenLayerOffset;
 
 		// Generate the neural network
 		NeuralNetwork<BackPropagation> neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
@@ -403,8 +433,8 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 		normalizer.normalize(trainingSet);
 		BackPropagation backPropagation = new BackPropagation();
 
-		backPropagation.setMaxIterations(maxEpochs);
-		backPropagation.setMaxError(maxError);
+		backPropagation.setMaxIterations(m_MaxEpochs);
+		backPropagation.setMaxError(m_MaxError);
 		neuralNetwork.learn(trainingSet, backPropagation);
 
 		log.log(Level.INFO, "Total error:" + backPropagation.getTotalNetworkError());
@@ -445,7 +475,7 @@ public class ReplicatorNeuralNetwork extends AbstractClassifier implements Techn
 		}
 					
 		// scores[1] = 1.0 means anomaly.
-		if (euclidianDistance > distanceThreshold) {			
+		if (euclidianDistance > m_DistanceThreshold) {			
 			scores[1] = 1.0;
 		} else {
 			scores[1] = 0.0;
